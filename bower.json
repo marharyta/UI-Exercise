@@ -1,0 +1,22 @@
+{
+  "name": "ui-exercise",
+  "description": "A ui exercise aimed at testing candidate's UI development skills",
+  "main": "index.js",
+  "authors": [
+    "VasZayarskiy <vas@holvi.com>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.5.8",
+    "angular-ui-router": "^0.3.1"
+  }
+}

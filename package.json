@@ -1,0 +1,23 @@
+{
+  "name": "ui-exercise",
+  "version": "1.0.0",
+  "description": "A ui exercise aimed at testing candidate's UI development skills",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bower": "^1.7.9",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-inject": "^4.1.0",
+    "gulp-pug": "^3.1.0",
+    "gulp-sass": "^2.3.2",
+    "gulp-sourcemaps": "^2.1.1",
+    "gulp-webserver": "^0.9.1",
+    "wiredep": "^4.0.0"
+  }
+}

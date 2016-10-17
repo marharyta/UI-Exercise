@@ -1,0 +1,10 @@
+table
+  tr
+    td
+      h4(
+        ng-repeat="driver in drivers track by driver.name"
+        ) {{ driver.name }}
+    td
+      p(
+        ng-repeat="team in teams track by team.id"
+        ) {{ team.name }}
