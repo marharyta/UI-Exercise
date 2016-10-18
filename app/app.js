@@ -12,6 +12,12 @@ var uiApp = angular.module('uiApp', [
           url: '/',
           templateUrl: 'dist/templates/list.ng.html',
           controller: function($scope){
+
+            // Write a function that picks a driver and updates
+            // their points every 2 seconds.
+            // .... YOUR CODE ...
+
+
             $scope.drivers = [
               { "points":0,
                 "name": "Kimi Räikkönen",
