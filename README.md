@@ -16,13 +16,13 @@ Feel free to add views, change whatever you want in the app, add new dependencie
 
 ## Tips to get started
 
-Install Node.js in your system
-
-    https://nodejs.org/en/download/
+Install Node.js in your system: https://nodejs.org/en/download/
 
 Install gulp and bower packages globally for Node.js (used for dependency management and app build)
 
 	npm install -g gulp bower
+
+You may as well need to install SASS: http://sass-lang.com/install
 
 Go to the UI-Exercise folder
 
