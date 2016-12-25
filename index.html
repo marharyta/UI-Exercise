@@ -27,28 +27,38 @@
 
   <script type="text/javascript">
   
-  //rate 1:10m skaling
+  /***
+    This is a demo of space formula 1
+    You have to bet on one of five rockets that will eventually make it to the orbit.
+    rate 1:10m skaling
+    atmosphere is 500km => 500km = 500 *1000m  => 500 000px
 
-  //racing ring
-  const distance = 30000;
-  const width = 1200;
-  const carSize = 50;
-  const distanceTillFinish = 2000; //km 
-  //const universeWidth = 1200;
+  ***/
 
-
-  //atmosphere is 500km => 500km = 500 *1000m  => 500 000px
+  //universe model variables
+  //distance of universe
   const h = 30000;
+  //width of universe
   const w = 1200;
+  //rocker size (or car-rocket)
   const rocketHeight = 50;
+  //distance they have to fly to reach the orbit
   const distanceToFly = 2000; //km to fly for the rocker
   const universeWidth = 1200;
+
+  //atmosphere heights
+  const tropopauzeHeight = 1200;
+  const stratopauzeHeight = 4500;
+  const mesopauzeHeight = 8500;
+  const thermopauzeHeight = 20000;
+  const ionosfeerHeight = 30000;
+
 
   const svg = d3.select("body").append("svg");
 
   svg 
     .attr("width", 900)
-    .attr("height", 500)//500
+    .attr("height", 600)
     .attr("preserveAspectRatio", "xMidYMin "+ "slice")
     .attr("viewBox", " " + 0 + " "+ 29900 + " " + w + " " + h+ " ")
     .attr("viewBox", " " + 0 + " "+ ((h-rocketHeight)- 40) + " " + w + " " + h+ " ");
@@ -107,27 +117,23 @@
 
   const mainGroup = svg.append("g");
 
-  //background
+  //background sky 
   const backgroundSky = mainGroup
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("height", h)
-      .attr("width", w )
-      .attr("fill", "url(#skyGradient)");
+    .append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("height", h)
+    .attr("width", w )
+    .attr("fill", "url(#skyGradient)");
 
+  
   //atmosphere layers
+
   const tropopauze = mainGroup.append("g"); //12 km => 12 * 1000m => 120 00m/100 => 1200px
   const stratopauze = mainGroup.append("g"); //45 km => 45 000m => 4500px
   const mesopauze = mainGroup.append("g"); //85 km => 85 000m => 8500px
   const thermopauze = mainGroup.append("g"); //20 0km > 200 0 00 = 20000px
   const ionosfeer = mainGroup.append("g"); //500km
-
-  const tropopauzeHeight = 1200;
-  const stratopauzeHeight = 4500;
-  const mesopauzeHeight = 8500;
-  const thermopauzeHeight = 20000;
-  const ionosfeerHeight = 30000;
 
   tropopauze
     .attr("id", "tropopauze")
@@ -238,12 +244,12 @@
     .text("2000");
 
   
-      //ozone layer
-    const ozoneLayer = stratopauze.append("g"); // 20-30km from earth => 20 000m => 2000
+  //ozone layer
+  const ozoneLayer = stratopauze.append("g"); // 20-30km from earth => 20 000m => 2000
     
-    ozoneLayer
+  ozoneLayer
       .attr("id", "ozoneLayer")
-    .attr("transform", "translate(0," + 1500 +")")
+      .attr("transform", "translate(0," + 1500 +")")
       .append("rect")
       .attr("x", 0)
       .attr("y", 0)
@@ -251,12 +257,7 @@
       .attr("width", w)
       .attr("fill", "url(#ozoneLayerGradient)");
 
-
-
-
-
   //stars
-
   let dataset = [];
   const starsGroup = mainGroup.append("g");
 
@@ -269,6 +270,7 @@
   }
 
   function randmizeStarPosition(){
+    let width = 1200;
     let w = Math.floor(Math.random() * width ) + 1;
     let h = Math.floor(Math.random() * (ionosfeerHeight - thermopauzeHeight)) + 1;
     return [w, h];
@@ -276,51 +278,184 @@
 
   dataset = generateStarsIonosphere(500);
   let stars = starsGroup.selectAll("circle")
-                .data(dataset)
-                .enter()
-                .append("circle")
-                .attr("cx", function(d, i) {
-              return randmizeStarPosition()[0];
-          })
-            .attr("cy", function(){
-              return randmizeStarPosition()[1];
-            })
-          .attr("r", function(d) {
-                  return d;
-          })
-          //style
-          .attr("fill", "white");
+      .data(dataset)
+      .enter()
+      .append("circle")
+      .attr("cx", function(d, i) {
+          return randmizeStarPosition()[0];
+      })
+      .attr("cy", function(){
+        return randmizeStarPosition()[1];
+      })
+      .attr("r", function(d) {
+          return d;
+      })
+      //style
+      .attr("fill", "white");
 
   
   //d3.selectAll("circle").attr("class", "star");
 
   //rocket  
-
   let rocket;
+  var rocketFly;
+  var rocketFlyTry;
 
-  function generateSpeedsRandomly(drivers){
+  function launchRocket(distanceToFly){
+    var yPos;
+    var start = null;
+    var starttime;
+    var distanceToFly = distanceToFly;
 
-  }
-  //generate cars from drivers json
-  function generateCars(drivers){
+    function step(timestamp, el, dist, duration) {
+      //starting point
+      dist = distanceToFly;
+      var timestamp = timestamp;
+      //runtine of the flight
+      var runtime = timestamp - starttime;
+      //progress of steps
+      var progress = runtime / duration;
+      //Math.min() is often used to clip a value so that it is always less than or equal to a boundary. For instance, this
+      progress = Math.min(progress, 1);
+      //if (!start) start = timestamp;
+      //var progress = timestamp - start;
       
-    for (var i = 0; i < drivers; i++) {
-      drawCar(0,0,0,0,10+i*100);
+      yPos = progress;
+      var calculatedRocketPosition = h-(dist*yPos)-rocketHeight;
+      svg.attr("viewBox", " " + 0 + " "+ calculatedRocketPosition + " " + w + " " +  h+ " ");
+     
+      d3.selectAll(".rocket").attr("y", calculatedRocketPosition + rocketHeight);
+
+      /*
+      if (yPos < (30000-rocketHeight)) {
+        rocketFly = window.requestAnimationFrame(step);
+      }
+      */
+
+      if (runtime < duration){ // if duration not met yet
+          requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
+              step(timestamp, el, dist, duration);
+          });
+      }
     }
-      
+
+    rocketFlyTry  = window.requestAnimationFrame(function(timestamp){
+        starttime = timestamp;
+        step(timestamp, 0, 4000, 6000);
+    });
+    
   }
 
-  function drawCar(driver, number, color, size, gap){
-     rocket = mainGroup
+  
+  function Rocket(width, height, yPos, xPos, speed, stopHeight, driver, color, distanceToFly) {
+    this.width = width;
+    this.height = height;
+    this.yPos = yPos;
+    this.xPos = xPos;
+    this.speed = speed;
+    this.distance = distanceToFly;
+    this.stopHeight = stopHeight;
+    this.flying = true;
+    this.driver = "?";
+    this.color = "green";
+    this.launchRocket = launchRocket;
+  }
+ 
+
+  function drawRocket( gap, width, height, yPos, xPos, speed, stopHeight, driver, color, distanceToFly){
+    let rocket = new Rocket(width, height, yPos, xPos, speed, stopHeight, driver, color, distanceToFly);
+    
+    rocketPic = mainGroup
       .append("rect")
       .attr("class", "rocket")
       .attr("x", w/2 - gap)
       .attr("y", h-rocketHeight)
       .attr("width", 20)
       .attr("height", rocketHeight);
+
+    return rocket;
   }
   
-  generateCars(5);
+  function randomlyGenerateDistance(){
+    return Math.floor((Math.random() * 20000) + 1000);
+  }
+
+  function randomlyGenerateDuration(){
+    return Math.floor((Math.random() * 6000) + 1000);
+  }
+
+  var rocketArr = [];
+
+    for (var i = 0; i < 5; i++) {
+      var random = randomlyGenerateDistance();
+      rocketArr.push(drawRocket(10+i*100,0,0,0,0, 0,0,0,0,random));
+      console.log(random);
+    }
+
+  function launchRockets(yPosition, xPosition, speed, stopHeight, rockets){
+    
+    var rockets = rocketArr;
+    var yPos;
+    var start = null;
+    var starttime;
+
+    function step(timestamp, el, dist, duration) {
+      //all elements
+      rockets = el;
+      //starting point
+      var timestamp = timestamp;
+      //runtine of the flight
+      var runtime = timestamp - starttime;
+      //progress of steps
+      var progress = runtime / duration;
+      //Math.min() is often used to clip a value so that it is always less than or equal to a boundary. For instance, this
+      progress = Math.min(progress, 1);
+      //if (!start) start = timestamp;
+      //var progress = timestamp - start;
+      
+      yPos = progress;
+
+      
+
+      var calculatedRocketPosition = h-(dist*yPos)-rocketHeight;
+
+
+      svg.attr("viewBox", " " + 0 + " "+ calculatedRocketPosition + " " + w + " " +  h+ " ");
+     
+      d3.selectAll(".rocket").attr("y", calculatedRocketPosition + rocketHeight);
+
+      /*
+      if (yPos < (30000-rocketHeight)) {
+        rocketFly = window.requestAnimationFrame(step);
+      }
+      */
+
+      if (runtime < duration){ // if duration not met yet
+          requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
+              step(timestamp, rockets, dist, duration);
+          });
+      }
+    }
+
+    rocketFly  = window.requestAnimationFrame(function(timestamp){
+        starttime = timestamp;
+        step(timestamp, rockets, 27000, 7000);
+       
+    });
+    
+  }
+
+  document.getElementById("start").addEventListener("click", function() {
+      launchRockets(0, 0);
+      //var rocketTry1 = drawRocket(10+2*100,0,0,0,0);
+  });
+
+  document.getElementById("stop").addEventListener("click", function() {
+    cancelAnimationFrame(rocketFly);
+    //cancelAnimationFrame(rocketFlyTry);
+  });
+
+  
 
   /*function followRocket (yOfRocket, yOfViewPOrt, speedOfFlight, hOfFlight, durationOfFlight){
 
@@ -394,38 +529,7 @@
   }*/
 
 
-  function startCars(yPosition, xPosition){
-    var yPos = yPosition;
-    var start = null;
-    var rocketFly;
-
-    function step(timestamp) {
-      if (!start) start = timestamp;
-      var progress = timestamp - start;
-      
-      yPos = progress;
-      svg.attr("viewBox", " " + 0 + " "+ (h-yPos-rocketHeight) + " " + w + " " +  h+ " ");
-     
-      d3.selectAll(".rocket").attr("y", (h-yPos));
-     
-
-      if (yPos < (30000-carSize)) {
-        rocketFly = window.requestAnimationFrame(step);
-      }
-
-    }
-
-    window.requestAnimationFrame(step);
-    document.getElementById("stop").addEventListener("click", function() {
-      cancelAnimationFrame(rocketFly);
-    });
-  }
-
-  document.getElementById("start").addEventListener("click", function() {
-      //launchRocket(0, 0);
-      startCars(0, 0);
-  });
-
+  
   /*
     function launchRocket(timestamp, yPosition, xPosition){
     function step(timestamp) {
