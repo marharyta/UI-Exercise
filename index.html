@@ -25,6 +25,7 @@
 
   <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js"></script>-->
   <script type="text/javascript" src="./d3.min.js"></script>
+  <script type="text/javascript" src="./generator.js"></script>
 
   <script type="text/javascript">
   
@@ -250,14 +251,14 @@
   const ozoneLayer = stratopauze.append("g"); // 20-30km from earth => 20 000m => 2000
     
   ozoneLayer
-      .attr("id", "ozoneLayer")
-      .attr("transform", "translate(0," + 1500 +")")
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("height", 1000)
-      .attr("width", w)
-      .attr("fill", "url(#ozoneLayerGradient)");
+    .attr("id", "ozoneLayer")
+    .attr("transform", "translate(0," + 1500 +")")
+    .append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("height", 1000)
+    .attr("width", w)
+    .attr("fill", "url(#ozoneLayerGradient)");
 
   //stars
   let dataset = [];
@@ -284,15 +285,14 @@
     .enter()
     .append("circle")
     .attr("cx", function(d, i) {
-          return randmizeStarPosition()[0];
+      return randmizeStarPosition()[0];
     })
     .attr("cy", function(){
-        return randmizeStarPosition()[1];
+      return randmizeStarPosition()[1];
     })
     .attr("r", function(d) {
-          return d;
+      return d;
     })
-      //style
     .attr("fill", "white");
 
   
@@ -303,7 +303,7 @@
   var rocketFly;
   var rocketFlyTry;
 
-  function launchRocket(distanceToFly){
+  /*function launchRocket(distanceToFly){
     var yPos;
     var start = null;
     var starttime;
@@ -328,11 +328,6 @@
      
       d3.selectAll(".rocket").attr("y", calculatedRocketPosition + rocketHeight);
 
-      /*
-      if (yPos < (30000-rocketHeight)) {
-        rocketFly = window.requestAnimationFrame(step);
-      }
-      */
 
       if (runtime < duration){ // if duration not met yet
           requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
@@ -347,22 +342,49 @@
     });
     
   }
+  */
 
   
-  function Rocket(width, height, yPos, xPos, speed, stopHeight, driver, color, distanceToFly) {
+  function Rocket(width, height, yPos, xPos, accStart) {
     this.width = width;
     this.height = height;
     this.yPos = yPos;
     this.xPos = xPos;
-    this.speed = speed;
-    this.distance = distanceToFly;
-    this.stopHeight = stopHeight;
+  
     this.flying = true;
-    this.driver = "?";
-    this.color = "green";
-    this.launch = launchRocket;
+    this.maxDistance = 30000;
+    this.maxVelocity = 100;
+    //this.launch = launchRocket;
+    this.state = {
+      yCoord: 0,
+      timestamp: 0,
+      accelaration: accStart,
+      velocity: 0,
+      finish: false
+    };
   }
  
+  Rocket.prototype.recalculateState = function (deltaTime) {
+    //vNext = vta*dt
+    var nextVelocity = this.state.velocity + this.state.accelaration * deltaTime;
+    var nextAccelaration = this.state.accelaration;
+    var yCoord = this.state.yCoord + this.state.velocity*deltaTime;
+    var finish = yCoord > this.maxDistance;
+
+    if (nextVelocity > this.maxVelocity) {
+      nextVelocity = this.maxVelocity;
+      nextAccelaration = 0;
+    }
+
+    var newState = {
+      yCoord: yCoord,
+      finish: finish,
+      timestamp: this.state.timestamp + deltaTime,
+      accelaration: nextAccelaration,
+      velocity: nextVelocity
+    };
+    this.state = newState;
+  };
 
   function drawRocket( gap, width, height, yPos, xPos, speed, stopHeight, driver, color, distanceToFly){
     let rocket = new Rocket(width, height, yPos, xPos, speed, stopHeight, driver, color, distanceToFly);
@@ -417,7 +439,7 @@
 
   var random = randomlyGenerateDistance();
     //rocketArr.push(drawRocket(10+1*100,0,0,0,0, 0,0,0,0,random));
-    rocketArr.push(drawRocket(10+2*100,0,0,0,0, 0,0,0,0,random));
+  rocketArr.push(drawRocket(10+2*100,0,0,0,0, 0,0,0,0,random));
 
    
 
@@ -430,15 +452,13 @@
     var calculatedRocketPositionI;
     var elI;
 
-    
-
-    for (var i = 0; i < rockets.length; i++) {
+   /* for (var i = 0; i < rockets.length; i++) {
         durationI = el[i].duration;
         distI = el[i].dist;
         //Math.max(...numbers) // 4
         calculatedRocketPositionI = h-(distI*yPos)-rocketHeight;
         el[i].el.attr("y", calculatedRocketPositionI + rocketHeight);
-    }
+    }*/
 
 
     var duration1 = el[0].duration;
@@ -453,14 +473,14 @@
       //el[0].duration = el[0].duration + 1;
       maxDuration = el[0].duration;
      
-      console.log(el[0].duration);
+      //console.log(el[0].duration);
     }
     else{
       maxDist = el[1].dist;
-     // el[1].duration = el[1].duration + 1;
+      //el[1].duration = el[1].duration + 1;
       maxDuration = el[1].duration;
       
-      console.log(el[1].duration);
+      //console.log(el[1].duration);
     }
 
 
@@ -481,8 +501,8 @@
     //console.log(progress, progress1, progress2);
     
     //Math.min() is often used to clip a value so that it is always less than or equal to a boundary. For instance, this
-   // progress = Math.min(progress, 1);
-   // progress1 = Math.min(progress1, 1);
+    // progress = Math.min(progress, 1);
+    // progress1 = Math.min(progress1, 1);
     //progress2 = Math.min(progress2, 1);
       
     //if (!start) start = timestamp;
@@ -520,11 +540,80 @@
       }
     }
 
+  var timeFix;
+
+  function step2(timestamp, el, dist, duration) {
+
+
+    const nextState = recalculateState(state, deltaTime);
+    state = nextState;
+    //starting point
+    var timestamp = timestamp;
+
+    //runtine of the flight
+    var runtime = timestamp - starttime;
+    //progress of steps
+
+    var progress = runtime / duration;
+
+    // use state here
+    // ....
+
+
+    // recalculate state based on delta time in the end of function
+    var deltaTime = timeFix === undefined ? 0 : timestamp - timeFix;
+
+    el.recalculateState(deltaTime);
+
+    timeFix = timestamp;
     
-
-
-
+    //Math.min() is often used to clip a value so that it is always less than or equal to a boundary. For instance, this
+    progress = Math.min(progress, 1);
     
+      
+    yPos = progress;
+
+    var calculatedRocketPosition = h-(dist*yPos)-rocketHeight;
+
+
+    svg.attr("viewBox", " " + 0 + " "+ calculatedRocketPosition + " " + w + " " +  h+ " ");
+
+     
+    el.attr("y", calculatedRocketPosition + rocketHeight);
+
+
+
+      if (runtime < duration){ // if duration not met yet
+          requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
+              step1(timestamp, el, dist, duration);
+          });
+      }
+    }
+
+
+
+
+    function step3(timestamp, el, dist, duration){
+
+    }
+
+      var starttime;
+       
+      function moveit(timestamp, el, dist, duration){
+          //if browser doesn't support requestAnimationFrame, generate our own timestamp using Date:
+          var timestamp = timestamp || new Date().getTime();
+          var runtime = timestamp - starttime;
+          var progress = runtime / duration;
+          progress = Math.min(progress, 1);
+          
+          if (runtime < duration){ // if duration not met yet
+              requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
+                  moveit(timestamp, el, dist, duration);
+              });
+          }
+      }
+       
+     
 
   function launchRockets(){
 
@@ -542,17 +631,28 @@
         dist: 30000,
         duration: 7000
       };
+
+      var rocketA = new Rocket(0, 0, 0, 0, 0, 0, 0, 0, 10);
       var testAr = [];
       testAr.push(obj1);
       testAr.push(obj2);
       
-      step1(timestamp, testAr, 27000, 7000);
-      //step1(timestamp, rocket2, 30000, 8000);
-      //step3(timestamp, rockets, 23000, 5000);
+      var firstRocket = d3.selectAll(".rocket");
+      //step1(timestamp, testAr, 27000, 7000);
+      //step1(timestamp, testAr, 30000, 8000);
+      
+      requestAnimationFrame(function(timestamp){
+          starttime = timestamp || new Date().getTime(); //if browser doesn't support requestAnimationFrame, generate our own timestamp using Date
+          //moveit(timestamp, adiv, 400, 2000); 
+          moveit(timestamp, rocket1, 27000, 7000);
+      });
+
        
     });
     
   }
+
+
 
   document.getElementById("start").addEventListener("click", function() {
       launchRockets();
@@ -657,6 +757,61 @@
     }
 
     window.requestAnimationFrame(step);
+  }
+
+  var start = null;
+
+var element = document.getElementById("SomeElementYouWantToAnimate");
+element.style.position = 'absolute';
+
+function step(timestamp) {
+  if (!start) start = timestamp;
+  var progress = timestamp - start;
+  element.style.left = Math.min(progress/10, 200) + "px";
+  if (progress < 2000) {
+    window.requestAnimationFrame(step);
+  }
+}
+
+window.requestAnimationFrame(step);
+
+
+
+
+    function step(timestamp, rocketObj, duration) {
+      var timestamp = timestamp;
+      
+      var progress = runtime / duration;
+      progress = Math.min(progress, 1);
+      if (!start) start = timestamp;
+      //var progress = timestamp - start;
+      
+      yPos = progress;
+      svg.attr("viewBox", " " + 0 + " "+ (h-yPos-rocketHeight) + " " + w + " " +  h+ " ");
+     
+      d3.selectAll(".rocket").attr("y", (h-yPos));
+
+      if (yPos < (30000-rocketHeight)) {
+        rocketFly = window.requestAnimationFrame(step);
+      }
+
+      if (runtime < duration){ // if duration not met yet
+          window.requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
+              //moveit(timestamp, el, dist, duration)
+              step(timestamp, rocketObj, duration);
+          });
+      }
+
+    }
+
+    //window.requestAnimationFrame(step);
+
+    window.requestAnimationFrame(function(timestamp){
+        starttime = timestamp || new Date().getTime(); 
+        //if browser doesn't support requestAnimationFrame, generate our own timestamp using Date
+        moveit(timestamp, adiv, 400, 2000); // 400px over 1 second
+    });
+    
   }
 
 
