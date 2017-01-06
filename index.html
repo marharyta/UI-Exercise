@@ -25,7 +25,7 @@
 
   <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js"></script>-->
   <script type="text/javascript" src="./d3.min.js"></script>
-  <script type="text/javascript" src="./generator.js"></script>
+  <!--<script type="text/javascript" src="./generator.js"></script>-->
 
   <script type="text/javascript">
   
@@ -296,65 +296,11 @@
     .attr("fill", "white");
 
   
-  //d3.selectAll("circle").attr("class", "star");
-
-  //rocket  
-  let rocket;
-  var rocketFly;
-  var rocketFlyTry;
-
-  /*function launchRocket(distanceToFly){
-    var yPos;
-    var start = null;
-    var starttime;
-    var distanceToFly = distanceToFly;
-
-    function step(timestamp, el, dist, duration) {
-      //starting point
-      dist = distanceToFly;
-      var timestamp = timestamp;
-      //runtine of the flight
-      var runtime = timestamp - starttime;
-      //progress of steps
-      var progress = runtime / duration;
-      //Math.min() is often used to clip a value so that it is always less than or equal to a boundary. For instance, this
-      progress = Math.min(progress, 1);
-      //if (!start) start = timestamp;
-      //var progress = timestamp - start;
-      
-      yPos = progress;
-      var calculatedRocketPosition = h-(dist*yPos)-rocketHeight;
-      svg.attr("viewBox", " " + 0 + " "+ calculatedRocketPosition + " " + w + " " +  h+ " ");
-     
-      d3.selectAll(".rocket").attr("y", calculatedRocketPosition + rocketHeight);
-
-
-      if (runtime < duration){ // if duration not met yet
-          requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
-              step(timestamp, el, dist, duration);
-          });
-      }
-    }
-
-    rocketFlyTry  = window.requestAnimationFrame(function(timestamp){
-        starttime = timestamp;
-        step(timestamp, 0, 4000, 6000);
-    });
-    
-  }
-  */
-
-  
-  function Rocket(width, height, yPos, xPos, accStart) {
-    this.width = width;
-    this.height = height;
-    this.yPos = yPos;
-    this.xPos = xPos;
-  
+  function Rocket(el, accStart) {
+    this.element = el;
     this.flying = true;
-    this.maxDistance = 30000;
+    this.maxDistance = h-rocketHeight;
     this.maxVelocity = 100;
-    //this.launch = launchRocket;
     this.state = {
       yCoord: 0,
       timestamp: 0,
@@ -365,29 +311,39 @@
   }
  
   Rocket.prototype.recalculateState = function (deltaTime) {
-    //vNext = vta*dt
-    var nextVelocity = this.state.velocity + this.state.accelaration * deltaTime;
-    var nextAccelaration = this.state.accelaration;
-    var yCoord = this.state.yCoord + this.state.velocity*deltaTime;
-    var finish = yCoord > this.maxDistance;
+        //vNext = vta*dt
+    if(this.state.finish === false){
+      var nextVelocity = this.state.velocity + this.state.accelaration * deltaTime;
+      var nextAccelaration = this.state.accelaration;
+      var yCoord = this.state.yCoord + this.state.velocity*deltaTime;
+      var finish = yCoord > this.maxDistance;
 
-    if (nextVelocity > this.maxVelocity) {
-      nextVelocity = this.maxVelocity;
-      nextAccelaration = 0;
+      if (nextVelocity > this.maxVelocity) {
+        nextVelocity = this.maxVelocity;
+        nextAccelaration = 0;
+      }
+
+      if(yCoord >= this.maxDistance){
+        console.log("ycoord",yCoord);
+        this.state.finish = true;
+        yCoord = 30000;
+      }
+
+      var newState = {
+        yCoord: yCoord,
+        finish: finish,
+        timestamp: this.state.timestamp + deltaTime,
+        accelaration: nextAccelaration,
+        velocity: nextVelocity
+      };
+      this.state = newState;
     }
-
-    var newState = {
-      yCoord: yCoord,
-      finish: finish,
-      timestamp: this.state.timestamp + deltaTime,
-      accelaration: nextAccelaration,
-      velocity: nextVelocity
-    };
-    this.state = newState;
+      
+  
+    
   };
 
   function drawRocket( gap, width, height, yPos, xPos, speed, stopHeight, driver, color, distanceToFly){
-    let rocket = new Rocket(width, height, yPos, xPos, speed, stopHeight, driver, color, distanceToFly);
     
     rocketPic = mainGroup
       .append("rect")
@@ -412,8 +368,6 @@
       .attr("y", h-rocketHeight)
       .attr("width", 20)
       .attr("height", rocketHeight);
-
-    return rocket;
   }
   
   function randomlyGenerateDistance(){
@@ -427,193 +381,119 @@
   var rocketArr = [];
   var rockets = rocketArr;
   var yPos;
-  var yPos1;
-  var yPos2;
   var start = null;
   var starttime;
 
-  /*for (var i = 0; i < 5; i++) {
-    
-    console.log(random);
-  }*/
+
 
   var random = randomlyGenerateDistance();
-    //rocketArr.push(drawRocket(10+1*100,0,0,0,0, 0,0,0,0,random));
   rocketArr.push(drawRocket(10+2*100,0,0,0,0, 0,0,0,0,random));
 
-   
-
-  function step1(timestamp, el, dist, duration) {
-    //el is an array of elemnts to be animated
-    var rockets = el;
-    var maxDist, maxDuration;
-    var durationI;
-    var distI;
-    var calculatedRocketPositionI;
-    var elI;
-
-   /* for (var i = 0; i < rockets.length; i++) {
-        durationI = el[i].duration;
-        distI = el[i].dist;
-        //Math.max(...numbers) // 4
-        calculatedRocketPositionI = h-(distI*yPos)-rocketHeight;
-        el[i].el.attr("y", calculatedRocketPositionI + rocketHeight);
-    }*/
-
-
-    var duration1 = el[0].duration;
-    var duration2 = el[1].duration;
-
-    var dist1 = el[0].dist;
-    var dist2 = el[1].dist;
-    
-    //find fastest rocket to follow
-    if(el[0].duration < el[1].duration){
-      maxDist = el[0].dist;
-      //el[0].duration = el[0].duration + 1;
-      maxDuration = el[0].duration;
-     
-      //console.log(el[0].duration);
-    }
-    else{
-      maxDist = el[1].dist;
-      //el[1].duration = el[1].duration + 1;
-      maxDuration = el[1].duration;
-      
-      //console.log(el[1].duration);
-    }
-
-
-    dist = maxDist;
-    duration = maxDuration;
-
-    //starting point
-    var timestamp = timestamp;
-    //runtine of the flight
-    var runtime = timestamp - starttime;
-    //progress of steps
-
-    var progress = runtime / duration;
-
-    //var progress1 = runtime / duration1;
-    //var progress2 = runtime / duration2;
-
-    //console.log(progress, progress1, progress2);
-    
-    //Math.min() is often used to clip a value so that it is always less than or equal to a boundary. For instance, this
-    // progress = Math.min(progress, 1);
-    // progress1 = Math.min(progress1, 1);
-    //progress2 = Math.min(progress2, 1);
-      
-    //if (!start) start = timestamp;
-    //var progress = timestamp - start;
-      
-    yPos = progress;
-
-    //yPos1 = progress1;
-    //yPos2 = progress2;
-
-    var calculatedRocketPosition = h-(dist*yPos)-rocketHeight;
-
-    var calculatedRocketPosition1 = h-(dist1*yPos)-rocketHeight;
-    var calculatedRocketPosition2 = h-(dist2*yPos)-rocketHeight;
-
-
-    svg.attr("viewBox", " " + 0 + " "+ calculatedRocketPosition + " " + w + " " +  h+ " ");
-     
-      //d3.selectAll(".rocket").attr("y", calculatedRocketPosition + rocketHeight);
-    el[1].el.attr("y", calculatedRocketPosition2 + rocketHeight);
-    el[0].el.attr("y", calculatedRocketPosition1 + rocketHeight);
-      //d3.select(".rocket2").attr("y", calculatedRocketPosition2 + rocketHeight);
-      //d3.select(".rocket2").attr("y", calculatedRocketPosition + rocketHeight);
-
-      /*
-      if (yPos < (30000-rocketHeight)) {
-        rocketFly = window.requestAnimationFrame(step);
-      }
-      */
-
-      if (runtime < duration){ // if duration not met yet
-          requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
-              step1(timestamp, el, dist, duration);
-          });
-      }
-    }
-
   var timeFix;
-
-  function step2(timestamp, el, dist, duration) {
-
-
-    const nextState = recalculateState(state, deltaTime);
-    state = nextState;
-    //starting point
-    var timestamp = timestamp;
-
-    //runtine of the flight
-    var runtime = timestamp - starttime;
-    //progress of steps
-
-    var progress = runtime / duration;
-
-    // use state here
-    // ....
-
-
-    // recalculate state based on delta time in the end of function
-    var deltaTime = timeFix === undefined ? 0 : timestamp - timeFix;
-
-    el.recalculateState(deltaTime);
-
-    timeFix = timestamp;
-    
-    //Math.min() is often used to clip a value so that it is always less than or equal to a boundary. For instance, this
-    progress = Math.min(progress, 1);
-    
-      
-    yPos = progress;
-
-    var calculatedRocketPosition = h-(dist*yPos)-rocketHeight;
-
-
-    svg.attr("viewBox", " " + 0 + " "+ calculatedRocketPosition + " " + w + " " +  h+ " ");
-
-     
-    el.attr("y", calculatedRocketPosition + rocketHeight);
-
-
-
-      if (runtime < duration){ // if duration not met yet
-          requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
-              step1(timestamp, el, dist, duration);
-          });
-      }
-    }
-
-
-
-
-    function step3(timestamp, el, dist, duration){
-
-    }
-
-      var starttime;
+  var starttime;
        
-      function moveit(timestamp, el, dist, duration){
-          //if browser doesn't support requestAnimationFrame, generate our own timestamp using Date:
-          var timestamp = timestamp || new Date().getTime();
-          var runtime = timestamp - starttime;
-          var progress = runtime / duration;
-          progress = Math.min(progress, 1);
-          
-          if (runtime < duration){ // if duration not met yet
-              requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
-                  moveit(timestamp, el, dist, duration);
-              });
-          }
-      }
-       
+  function moveit(timestamp, el, dist, duration){
+        var elm = el.element;
+        //if browser doesn't support requestAnimationFrame, generate our own timestamp using Date:
+        
+        //starting point
+        var timestamp = timestamp;
+
+        //runtine of the flight
+        var runtime = timestamp - starttime;
+        //progress of steps
+
+        var progress = runtime / duration;
+
+      // use state here
+      // ....
+
+
+
+      // recalculate state based on delta time in the end of function
+      var deltaTime = timeFix === undefined ? 0 : timestamp - timeFix;
+
+      //el.recalculateState(deltaTime);
+      el.recalculateState( deltaTime);
+
+      console.log(el);
+      //state = nextState;
+
+      timeFix = timestamp;
+        var timestamp = timestamp || new Date().getTime();
+        var runtime = timestamp - starttime;
+        var progress = runtime / duration;
+        progress = Math.min(progress, 1);
+        var calculatedRocketPosition = h-(dist*progress)-rocketHeight;
+
+        var yCoord = el.state.yCoord;
+        //svg.attr("viewBox", " " + 0 + " "+ calculatedRocketPosition + " " + w + " " +  h+ " ");
+        //elm.attr("y", calculatedRocketPosition + rocketHeight);
+        elm.attr("y", yCoord - rocketHeight);
+
+        
+        if (runtime < duration){ // if duration not met yet
+            requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
+                moveit(timestamp, el, dist, duration);
+            });
+        }
+    }
      
+    function moveSky(timestamp, el, dist, duration){
+        var elm = el.element;
+        //if browser doesn't support requestAnimationFrame, generate our own timestamp using Date:
+        
+        //starting point
+        var timestamp = timestamp;
+
+        //runtine of the flight
+        var runtime = timestamp - starttime;
+        //progress of steps
+
+        var progress = runtime / duration;
+
+      // use state here
+      // ....
+
+
+      // recalculate state based on delta time in the end of function
+      var deltaTime = timeFix === undefined ? 0 : timestamp - timeFix;
+
+      //el.recalculateState(deltaTime);
+      el.recalculateState( deltaTime);
+
+      console.log(el.state);
+      //state = nextState;
+
+      timeFix = timestamp;
+        var timestamp = timestamp || new Date().getTime();
+        var runtime = timestamp - starttime;
+        var progress = runtime / duration;
+        progress = Math.min(progress, 1);
+        var calculatedRocketPosition = h-(dist*progress)-rocketHeight;
+
+        var yCoord = el.state.yCoord;
+        //svg.attr("viewBox", " " + 0 + " "+ calculatedRocketPosition + " " + w + " " +  h+ " ");
+        //elm.attr("y", calculatedRocketPosition + rocketHeight);
+      //if browser doesn't support requestAnimationFrame, generate our own timestamp using Date:
+       /* var timestamp = timestamp || new Date().getTime();
+        var runtime = timestamp - starttime;
+        var progress = runtime / duration;
+        progress = Math.min(progress, 1);
+        var calculatedRocketPosition = h-(dist*progress)-rocketHeight;*/
+
+        //svg.attr("viewBox", " " + 0 + " "+ calculatedRocketPosition + " " + w + " " +  h+ " ");
+        //el.attr("y", calculatedRocketPosition + rocketHeight);
+        //yCoord
+        svg.attr("viewBox", " " + 0 + " "+ yCoord + " " + w + " " +  h+ " ");
+        
+        if (runtime < duration){ // if duration not met yet
+            requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
+                moveSky(timestamp, el, dist, duration);
+            });
+        }
+    }
+   
 
   function launchRockets(){
 
@@ -632,7 +512,6 @@
         duration: 7000
       };
 
-      var rocketA = new Rocket(0, 0, 0, 0, 0, 0, 0, 0, 10);
       var testAr = [];
       testAr.push(obj1);
       testAr.push(obj2);
@@ -640,11 +519,16 @@
       var firstRocket = d3.selectAll(".rocket");
       //step1(timestamp, testAr, 27000, 7000);
       //step1(timestamp, testAr, 30000, 8000);
-      
+
+      var rocketA = new Rocket(rocket1, 2);
+      var rocketB = new Rocket(rocket2, 90);
       requestAnimationFrame(function(timestamp){
           starttime = timestamp || new Date().getTime(); //if browser doesn't support requestAnimationFrame, generate our own timestamp using Date
           //moveit(timestamp, adiv, 400, 2000); 
-          moveit(timestamp, rocket1, 27000, 7000);
+          moveSky(timestamp, rocketA, 2000, 7000);
+          moveit(timestamp, rocketA, 2000, 7000);
+          //moveit(timestamp, rocketB, 27000, 8000);
+
       });
 
        
