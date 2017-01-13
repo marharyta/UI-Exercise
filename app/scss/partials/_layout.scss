@@ -1,0 +1,25 @@
+#rocketEngine{
+  width: 100%;
+}
+
+#start{
+  position: absolute;
+}
+
+.table{
+  width: 100%;
+  font-family: $base-font-family;
+}
+
+#cloud1{
+  -webkit-animation: fall 1s linear infinite;
+}
+
+@-webkit-keyframes fall {
+  from{
+    transform: translateY(-100px);
+  }
+  to {
+    transform: translateY(1000px)
+  }
+}

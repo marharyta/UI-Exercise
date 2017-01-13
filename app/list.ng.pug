@@ -1,10 +1,11 @@
 table
   tr
     td
-      h4(
-        ng-repeat="driver in drivers track by driver.name"
+      p(
+        ng-repeat="driver in drivers | orderBy:'-points'"
         ) {{ driver.name }}
+    
     td
       p(
-        ng-repeat="team in teams track by team.id"
-        ) {{ team.name }}
+        ng-repeat="driver in drivers | orderBy:'-points'"
+        ) {{ driver.points }}

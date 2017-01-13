@@ -14,7 +14,7 @@ var pathConfig = {
     index:      './index.html',
     templates:  './app/**/*.pug',
     scripts:    './app/**/*.js',
-    styles:     './app/**/*.scss'
+    styles:     './app/scss/*.scss'
   },
   dist: {
     templates:  './dist/templates',

@@ -1,0 +1,23 @@
+body{
+  width: 100%;
+}
+h1 {
+  font-family: $header-font-family;
+  font-weight: $header-font-weight;
+  margin: 30px auto;
+  display: block;
+  text-align: center;
+  width: 80%;
+  color: $header-font-color;
+}
+table{
+  width: 100%;
+}
+td{
+  background: grey;
+  width: 50%;
+}
+
+div{
+  width: 100%;
+}

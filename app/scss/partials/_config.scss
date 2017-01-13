@@ -1,0 +1,25 @@
+//import fonts
+@import url('https://fonts.googleapis.com/css?family=Bungee+Shade|Josefin+Sans|Orbitron');
+
+/*
+font-family: 'Bungee Shade', cursive;
+font-family: 'Orbitron', sans-serif;
+font-family: 'Josefin Sans', sans-serif;
+*/
+// Font weights
+$light: 100;
+$regular: 400;
+$bold: 600;
+
+//Headinf Font
+$header-font-weight: $bold;
+$header-font-family: 'Bungee Shade', cursive;
+
+// Base Font
+$base-font-family: 'Josefin Sans', sans-serif;
+$base-font-weight: $regular;
+$base-font-size: 13px;
+$base-line-height: 1.4;
+
+//Colors
+$header-font-color: yellow;

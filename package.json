@@ -19,5 +19,11 @@
     "gulp-sourcemaps": "^2.1.1",
     "gulp-webserver": "^0.9.1",
     "wiredep": "^4.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.12.2",
+    "eslint-config-airbnb-base": "^11.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "gulp-sass": "^2.3.2"
   }
 }
