@@ -18,6 +18,10 @@ td{
   width: 50%;
 }
 
+tr:nth-child(2n) {
+    background: white;
+}
+
 div{
   width: 100%;
 }

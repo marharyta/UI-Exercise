@@ -4,6 +4,12 @@
 
 #start{
   position: absolute;
+  position: absolute;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  left: 48%;
+  font-family: $base-font-family;
 }
 
 .table{
@@ -12,14 +18,21 @@
 }
 
 #cloud1{
-  -webkit-animation: fall 1s linear infinite;
+  -webkit-animation: fall 5s linear infinite;
 }
 
 @-webkit-keyframes fall {
   from{
-    transform: translateY(-100px);
+    transform: translateX(-100px);
   }
   to {
-    transform: translateY(1000px)
+    transform: translateX(1000px)
   }
+}
+
+
+#winner {
+  -vendor-animation-duration: 9s;
+  -vendor-animation-delay: 20s;
+  -vendor-animation-iteration-count: infinite;
 }

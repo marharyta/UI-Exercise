@@ -12,67 +12,82 @@ var uiApp = angular.module('uiApp', [
           url: '/',
           templateUrl: 'dist/templates/list.ng.html',
           controller: function($scope){
+            $scope.show = false;
+
+            $scope.setShow = function(){
+               $scope.show = false;
+            };
 
             $scope.drivers = [
               { "points":0,
                 "name": "Kimi Räikkönen",
                 "country": "fi",
                 "car": "assets/images/homer-simpson.svg",
-                "team": 1
+                "team": 1,
+                "winner": false
               },
               { "points":0,
                 "name": "Fernando Alonso",
                 "car": "assets/images/monarchbutterfly.svg",
                 "country": "es",
-                "team": 1
+                "team": 1,
+                "winner": false
               },
               { "points":0,
                 "name": "Nico Rosberg",
                 "car": "assets/images/owl.svg",
                 "country": "de",
-                "team": 2
+                "team": 2,
+                "winner": false
               },
               { "points":0,
                 "name": "Lewis Hamilton",
                 "car": "assets/images/lion.svg",
                 "country": "uk",
-                "team": 2
+                "team": 2,
+                "winner": false
               },
               { "points":0,
                 "name": "Sebastian Vettel",
                 "car": "assets/images/lion2.jpg",
                 "country": "de",
-                "team": 3
+                "team": 3,
+                "winner": false
               },
               { "points":0,
                 "name": "Daniel Ricciardo",
                 "car": "assets/images/penguin.svg",
                 "country": "au",
-                "team": 3
+                "team": 3,
+                "winner": false
               },
               { "points":0,
                 "name": "Valtteri Botas",
                 "car": "assets/images/panter.jpg",
                 "country": "fi",
-                "team": 4
+                "team": 4,
+                "winner": false
               },
               { "points":0,
                 "name": "Felipe Massa",
                 "car": "assets/images/eagle.png",
                 "country": "br",
-                "team": 4
+                "team": 4,
+                "winner": false
               },
               { "points":0,
                 "name": "Kevin Magnussen",
                 "car": "assets/images/hedgehog.svg",
                 "country": "dk",
-                "team": 5
+                "team": 5,
+                "winner": false
               },
               { "points":0,
                 "name": "Jenson Button",
                 "car": "assets/images/squirrel.png",
                 "country": "uk",
-                "team": 5
+                "team": 5,
+                "winner": false
               }
             ];
             $scope.teams = [
@@ -281,6 +296,14 @@ var uiApp = angular.module('uiApp', [
               .attr('height', 500)
               .attr("xlink:href", "assets/images/baloon.png");
 
+             stratopauze
+              .append("svg:image")
+              .attr('x', 500)
+              .attr('y', 600)
+              .attr('width', 200)
+              .attr('height', 500)
+              .attr("xlink:href", "assets/images/jet.png");
+
             mesopauze
               .attr("id", "mesopauze")
               .attr("transform", "translate(0," + (h-mesopauzeHeight) +")")
@@ -291,6 +314,16 @@ var uiApp = angular.module('uiApp', [
               .attr("width", w)
               .attr("fill", "transparent");
 
+
+            mesopauze
+              .append("svg:image")
+              .attr('x', 600)
+              .attr('y', 100)
+              .attr('width', 800)
+              .attr('height', 500)
+              .attr("xlink:href", "assets/images/sattelite1.png");
+
+
             thermopauze
               .attr("id", "thermopauze")
               .attr("transform", "translate(0," + (h-thermopauzeHeight) +")")
@@ -300,6 +333,15 @@ var uiApp = angular.module('uiApp', [
               .attr("height", thermopauzeHeight - mesopauzeHeight)
               .attr("width", w )
               .attr("fill", "transparent");
+
+             thermopauze
+              .append("svg:image")
+              .attr('x', 600)
+              .attr('y', 100)
+              .attr('width', 800)
+              .attr('height', 500)
+              .attr("xlink:href", "assets/images/sattelite3.svg");
+
 
             ionosfeer
               .attr("id", "ionosfeer")
@@ -483,13 +525,28 @@ var uiApp = angular.module('uiApp', [
               };
             }
 
-            function showWinner(winner){
-              let winnerSign =  ionosfeer
+            function showWinner(position){
+
+              let winnerSign = mainGroup
+                  .append("g")
+                  .attr("transform", "translate(200, " + (position +50) + ")");
+                
+                winnerSign.append("circle")
+                   .attr("cx", 0)
+                   .attr("cy", 0)
+                   .attr("r", 20)
+                   .attr("fill", "green")
+                   .attr("class", "animated bounceIn")
+                   .attr("id", "winner");
+
+              winnerSign =  mainGroup
                 .append("text")
                 .attr("x",function(){
                   return 200;
                 })
-                .attr("y", 200)
+                .attr("y", function(){
+                  return position +50;
+                })
                 .text("Winner!");
             }
          
@@ -514,7 +571,12 @@ var uiApp = angular.module('uiApp', [
                   });
               }
               else{
-               
+                $scope.$apply(function(scope) {
+                  // Execute this function with the scope
+                  scope.drivers[num].winner = true;
+                  scope.show = true;
+
+                });
               }
             }
        
@@ -533,12 +595,14 @@ var uiApp = angular.module('uiApp', [
                       moveSky(timestamp, el, dist, duration);
                   });
               } else{
-                 showWinner();
+                 showWinner(calculatedRocketPosition);
               }
             }
-     
+
+
             
             function launchRockets(){
+              var countdown;
               var rockets = [];
               var allRockets = d3.selectAll(".rocketG")._groups[0].length;
               for (var i = 0; i < allRockets; i++) {
@@ -556,9 +620,9 @@ var uiApp = angular.module('uiApp', [
                       if(random >= distance){
                         distance = random;
                       }
-                      moveit(timestamp, rockets[i], random, 12000, i);
+                      moveit(timestamp, rockets[i], random, 24000, i);
                     };
-                    moveSky(timestamp, rockets[1], distance, 12000);
+                    moveSky(timestamp, rockets[1], distance, 24000);
                 });
               });
               
