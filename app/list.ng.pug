@@ -1,10 +1,9 @@
-table(
-       ng-show="show"
-      )
+table 
   tr
     td
       p(
         ng-repeat="driver in drivers | orderBy:'-points'"
+        ng-class='{in:$first}'
         ) {{ driver.name }}
     
     td

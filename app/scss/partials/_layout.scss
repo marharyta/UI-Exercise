@@ -1,5 +1,6 @@
 #rocketEngine{
   width: 100%;
+      z-index: -1;
 }
 
 #start{
@@ -36,3 +37,8 @@
   -vendor-animation-delay: 20s;
   -vendor-animation-iteration-count: infinite;
 }
+
+.in{
+  background-color: red;
+}
+

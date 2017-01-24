@@ -122,6 +122,12 @@ var uiApp = angular.module('uiApp', [
               atmosphere is 500km => 500km = 500 *1000m  => 500 000px
 
             ***/
+            var wind = window,
+                  d = document,
+                  e = d.documentElement,
+                  g = d.getElementsByTagName('body')[0],
+                  x = wind.innerWidth || e.clientWidth || g.clientWidth,
+                  y = wind.innerHeight|| e.clientHeight|| g.clientHeight;
 
             //universe model variables
             //distance of universe
@@ -147,38 +153,37 @@ var uiApp = angular.module('uiApp', [
             const svg = d3.select("body").append("svg");
 
             let windowSize = 900;
+            let size;
+            
+            size = h-y + 40;
+            size.toFixed(3);
 
             svg 
-              .attr("width", 900)
-              .attr("height", 600)
+              .attr("width", x)
+              .attr("height", y)
               .attr("id", "rocketEngine")
               .attr("preserveAspectRatio", "xMidYMin "+ "slice")
-              .attr("viewBox", " " + 0 + " "+ ((h-rocketHeight)- 40-600) + " " + w + " " + h+ " ");
+              .attr("viewBox", " " + 0 + " "+  size + " " + w + " " + y + " ");
 
             //change svg on resize
             function changeOnResize(){
-                var wind = window,
-                    d = document,
-                    e = d.documentElement,
-                    g = d.getElementsByTagName('body')[0],
-                    x = wind.innerWidth || e.clientWidth || g.clientWidth,
-                    y = wind.innerHeight|| e.clientHeight|| g.clientHeight;
 
-                    windowSize = x;
-                    svg
-                    .attr("width", windowSize)
-                    .attr("viewBox", " " + 0 + " "+ ((h-rocketHeight)- 40-600) + " " + w + " " + h+ " ");
-
+              size = h-y + 40;    
+              size.toFixed(3);
+              svg
+                .attr("height", y)
+                .attr("width", x)
+                .attr("viewBox", " " + 0 + " "+ size + " " + w + " " + y + " ");
             }
 
             changeOnResize();
 
             window.addEventListener('resize', function(event){
               changeOnResize();
+              location.reload(true);
             });
            
-
-              //create defs for extra elements
+            //create defs for extra elements
 
             var defs = svg.append("defs");
 
@@ -563,7 +568,7 @@ var uiApp = angular.module('uiApp', [
                 scope.drivers[num].points = h-calculatedRocketPosition-rocketHeight;
               });
               
-              d3.select(".rocketT"+ num + " ").text($scope.drivers[num].points + "");
+              d3.select(".rocketT"+ num + " ").text($scope.drivers[num].points.toFixed(2) + "");
                   
               if (runtime < duration){ // if duration not met yet
                   requestAnimationFrame(function(timestamp){ // call requestAnimationFrame again with parameters
@@ -585,7 +590,7 @@ var uiApp = angular.module('uiApp', [
               var runtime = timestamp - starttime;
               var progress = runtime / duration;
               progress = Math.min(progress, 1);
-              var calculatedRocketPosition = h-(dist*progress)-rocketHeight;
+              var calculatedRocketPosition = h-(dist*progress)-rocketHeight*6;
               if(calculatedRocketPosition >= 2000){
                 //moveSmth
               }
@@ -596,6 +601,8 @@ var uiApp = angular.module('uiApp', [
                   });
               } else{
                  showWinner(calculatedRocketPosition);
+                 //show winner on table
+                 document.getElementsByTagName("TR")[0].style.backgroundColor = "red !important";
               }
             }
 
